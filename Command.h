@@ -1,3 +1,9 @@
+/**
+ * Command
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 #include "Arduino.h"
 
 #ifndef Command_h

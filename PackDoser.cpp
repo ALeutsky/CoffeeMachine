@@ -1,3 +1,9 @@
+/**
+ * PackDoser
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 #include "Arduino.h"
 #include "PackDoser.h"
 

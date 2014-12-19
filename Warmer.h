@@ -1,6 +1,8 @@
-/*
-
-*/
+/**
+ * Warmer
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
 
 #ifndef Warmer_h
 
@@ -9,7 +11,9 @@
 class Warmer
 {
   public:
-    Warmer(int pin);
+    Warmer();
+    
+    void attach(int pin);
 
     bool isActive;
     

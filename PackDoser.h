@@ -1,3 +1,9 @@
+/**
+ * PackDoser
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 /*
 0-120
 */

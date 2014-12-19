@@ -1,6 +1,8 @@
-/*
-
-*/
+/**
+ * WaterMeter
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
 
 #include "Arduino.h"
 #include "WaterMeter.h"
@@ -10,20 +12,20 @@ WaterMeter::WaterMeter(int tp, int ep, long h)
 {
    pinMode(tp, OUTPUT);
    pinMode(ep, INPUT);
-   trig_pin = tp;
-   echo_pin = ep;
+   trigPin = tp;
+   echoPin = ep;
    height   = h;
 }
 
 
 long WaterMeter::distance() 
 {
-  digitalWrite(trig_pin, LOW);
+  digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
-  digitalWrite(trig_pin, HIGH);
+  digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trig_pin, LOW);
-  p_duration = pulseIn(echo_pin, HIGH);
+  digitalWrite(trigPin, LOW);
+  p_duration = pulseIn(echoPin, HIGH);
   p_distance = p_duration * 100 / 266 / 2; // 29
   return p_distance;
 }

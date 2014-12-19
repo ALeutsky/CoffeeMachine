@@ -1,3 +1,9 @@
+/**
+ * SandDoser
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 #include "Arduino.h"
 #include "SandDoser.h"
 

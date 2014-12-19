@@ -1,21 +1,27 @@
+/**
+ * CoffeeMachine
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 #include <Servo.h>
 #include "./Command.h"
-#include "./Warmer.h"
-#include "./WaterMeter.h"
+#include "./WaterDoser.h"
 
-#define warmerPin 2
-#define wmTrigPin 4
-#define wmEchoPin 5
-#define sandDoserPin 6
-#define packDoserPin 7
+#define WARMER_PIN 2
+#define WM_TRIG_PIN 4
+#define WM_ECHO_PIN 5
+#define TANK_HEIGHT 128
+#define SAND_DOSER_PIN 6
+#define PACK_DOSER_PIN 7
 
 
-Warmer warmer(warmerPin);
-WaterMeter waterMeter(wmTrigPin, wmEchoPin, 128);
+WaterDoser waterDoser(WARMER_PIN, WM_TRIG_PIN, WM_ECHO_PIN, TANK_HEIGHT);
 
 Command inCmd;
 String serialInputString;
 bool hasNewCommand;
+bool processing;
 
 
 // the setup routine runs once when you press reset:
@@ -24,25 +30,67 @@ void setup() {
   serialInputString.reserve(40);
   serialInputString = "";
   hasNewCommand = false;
+  processing = false;
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
-  long level = waterMeter.avgLevel(10, 30); // ~ 300ms
-  //Serial.print("The level:");
-  //Serial.println(level); // ~ 300m
+  int error;
+  
+  waterDoser.refresh(); // ~ 150ms
+  
+  if (processing && !waterDoser.isActive()) {
+    processing = false;
+    Serial.println("$READY");
+  }
   
   if (hasNewCommand) {
     hasNewCommand = false;
     
     if (inCmd.name() == "$STATE") {
       Serial.print("$STATE,");
-      Serial.print("WAITING,");
-      Serial.println(waterMeter.levelToPercent(level));
-    } else if (inCmd.name() == "$DO") {
+      Serial.print(processing ? "PROCESSING," : "WAITING,");
+      Serial.println(waterDoser.levelPercent);
+      
+    } else if (inCmd.name() == "$DO") { // $DO,DRINK_NAME,CUPS,PORTION
+      if (processing) {
+        Serial.println("$ERROR,BUSY");
+      } else {
+        error = 0;
+        
+        if (inCmd.at(1) == "COFFEE") {
+          error = waterDoser.start(inCmd.at(2).toInt());
+          
+        } else if (inCmd.at(1) == "TEA") {
+          error = waterDoser.start(inCmd.at(2).toInt());
+          
+        } else {
+          error = -1;
+        }
+        
+        if (error == 0) {
+          processing = true;
+        } else {
+          Serial.print("$ERROR,");
+          
+          switch(error) {
+            case -1:
+              Serial.println("UNKNOWN DRINK");
+              break;
+            case 1:
+              Serial.println("NO WATER");
+              break;
+            case 2:
+              Serial.println("NOT ENOUGH WATER");
+              break;
+            default:
+              Serial.println("UNKNOWN ERROR");
+          }
+        }      
+      }
       
     } else {
-      Serial.println("UNKNOWN COMMAND");
+      Serial.println("$ERROR,UNKNOWN COMMAND");
     }
   }
 }

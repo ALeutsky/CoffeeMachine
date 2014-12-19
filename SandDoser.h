@@ -1,3 +1,9 @@
+/**
+ * SandDoser
+ * @author Alexander Leutsky
+ * @license CC BY-NC-SA
+ */
+
 /*
 3-73
 */
