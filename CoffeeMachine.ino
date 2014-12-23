@@ -7,16 +7,19 @@
 #include <Servo.h>
 #include "./Command.h"
 #include "./WaterDoser.h"
+#include "./Doser.h"
 
 #define WARMER_PIN 2
 #define WM_TRIG_PIN 4
 #define WM_ECHO_PIN 5
 #define TANK_HEIGHT 128
-#define SAND_DOSER_PIN 6
-#define PACK_DOSER_PIN 7
+#define COFFEE_DOSER_PIN 6
+#define TEA_DOSER_PIN 7
 
 
-WaterDoser waterDoser(WARMER_PIN, WM_TRIG_PIN, WM_ECHO_PIN, TANK_HEIGHT);
+WaterDoser* waterDoser;
+Doser* coffeeDoser;
+Doser* teaDoser;
 
 Command inCmd;
 String serialInputString;
@@ -31,15 +34,19 @@ void setup() {
   serialInputString = "";
   hasNewCommand = false;
   processing = false;
+  
+  waterDoser  = new WaterDoser(WARMER_PIN, WM_TRIG_PIN, WM_ECHO_PIN, TANK_HEIGHT);
+  coffeeDoser = new Doser(COFFEE_DOSER_PIN, 10, 73, 2);
+  teaDoser    = new Doser(TEA_DOSER_PIN, 0, 120, 2);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
   int error;
   
-  waterDoser.refresh(); // ~ 150ms
+  waterDoser->refresh(); // ~ 150ms
   
-  if (processing && !waterDoser.isActive()) {
+  if (processing && !waterDoser->isActive()) {
     processing = false;
     Serial.println("$READY");
   }
@@ -50,7 +57,7 @@ void loop() {
     if (inCmd.name() == "$STATE") {
       Serial.print("$STATE,");
       Serial.print(processing ? "PROCESSING," : "WAITING,");
-      Serial.println(waterDoser.levelPercent);
+      Serial.println(waterDoser->levelPercent);
       
     } else if (inCmd.name() == "$DO") { // $DO,DRINK_NAME,CUPS,PORTION
       if (processing) {
@@ -59,10 +66,16 @@ void loop() {
         error = 0;
         
         if (inCmd.at(1) == "COFFEE") {
-          error = waterDoser.start(inCmd.at(2).toInt());
+          //error = waterDoser->start(inCmd.at(2).toInt());
+          if (!error) {
+            coffeeDoser->shift(inCmd.at(3).toInt());
+          }
           
         } else if (inCmd.at(1) == "TEA") {
-          error = waterDoser.start(inCmd.at(2).toInt());
+          //error = waterDoser->start(inCmd.at(2).toInt());
+          if (!error) {
+            teaDoser->shift(inCmd.at(3).toInt());
+          }
           
         } else {
           error = -1;

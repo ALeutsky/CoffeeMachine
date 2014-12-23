@@ -11,9 +11,7 @@
 class Warmer
 {
   public:
-    Warmer();
-    
-    void attach(int pin);
+    Warmer(int pin);
 
     bool isActive;
     
