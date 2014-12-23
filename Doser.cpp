@@ -24,8 +24,9 @@ Doser::~Doser()
 void Doser::shift(int portions) 
 {
   int i;
+  int n = portions * portionSize;
   
-  for (i = 0; i < portions; i++) {
+  for (i = 0; i < n; i++) {
     servo->write(maxPos);
     delay(500);
     servo->write(minPos);
