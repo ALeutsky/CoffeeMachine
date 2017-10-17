@@ -12,7 +12,7 @@ WaterDoser::WaterDoser(int warmerPin, int trigPin, int echoPin, int tankHeight)
   meter  = new WaterMeter(trigPin, echoPin, tankHeight);
   
   p_isActive = false;
-  p_cupSize = 20; // mm
+  p_cupSize = 15; // mm
   p_minLevel = 5; // mm
 }
 
@@ -25,7 +25,7 @@ bool WaterDoser::isActive()
 
 int WaterDoser::start(long cups)
 {
-  if (level - p_minLevel) {
+  if (level <= p_minLevel) {
     return 1;
   }
   

@@ -29,7 +29,7 @@ bool processing;
 
 // the setup routine runs once when you press reset:
 void setup() {
-  Serial.begin(19200);
+  Serial.begin(9600);
   serialInputString.reserve(40);
   serialInputString = "";
   hasNewCommand = false;
@@ -37,12 +37,13 @@ void setup() {
   
   waterDoser  = new WaterDoser(WARMER_PIN, WM_TRIG_PIN, WM_ECHO_PIN, TANK_HEIGHT);
   coffeeDoser = new Doser(COFFEE_DOSER_PIN, 10, 73, 2);
-  teaDoser    = new Doser(TEA_DOSER_PIN, 0, 120, 2);
+  teaDoser    = new Doser(TEA_DOSER_PIN, 0, 130, 2);
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
   int error;
+  int portions;
   
   waterDoser->refresh(); // ~ 150ms
   
@@ -66,15 +67,19 @@ void loop() {
         error = 0;
         
         if (inCmd.at(1) == "COFFEE") {
-          //error = waterDoser->start(inCmd.at(2).toInt());
+          portions = inCmd.at(2).toInt();
+          error = waterDoser->start(inCmd.at(2).toInt());
+          
           if (!error) {
-            coffeeDoser->shift(inCmd.at(3).toInt());
+            coffeeDoser->shift(portions * inCmd.at(3).toInt());
           }
           
         } else if (inCmd.at(1) == "TEA") {
-          //error = waterDoser->start(inCmd.at(2).toInt());
+          portions = inCmd.at(2).toInt();
+          error = waterDoser->start(inCmd.at(2).toInt());
+          
           if (!error) {
-            teaDoser->shift(inCmd.at(3).toInt());
+            teaDoser->shift(portions * inCmd.at(3).toInt());
           }
           
         } else {
